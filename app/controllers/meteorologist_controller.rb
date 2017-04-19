@@ -17,26 +17,27 @@ class MeteorologistController < ApplicationController
 
     url = "http://maps.googleapis.com/maps/api/geocode/json?address="+@street_address.gsub(" ","+")+"&sensor=false"
     raw_data = open(url).read
-    results = parsed_data["results"]
+    parsed_data = JSON.parse(raw_data)
 
     @latitude = parsed_data["results"][0]["geometry"]["location"]["lat"]
 
     @longitude = parsed_data["results"][0]["geometry"]["location"]["lng"]
 
 
-    url2 = "https://api.darksky.net/forecast/7fc007d5dede10e35e2754a7e49888b0/"+@latitude+","@longitude
-    raw_data = open(url2).read
+    url2 = "https://api.darksky.net/forecast/7fc007d5dede10e35e2754a7e49888b0/#{@latitude},#{@longitude}"
+    raw_data2 = open(url2).read
+    parsed_data2 = JSON.parse(raw_data2)
 
 
-    @current_temperature = parsed_data["currently"][0]["temperature"]
+    @current_temperature = parsed_data2["currently"]["temperature"]
 
-    @current_summary = parsed_data["currently"][0]["Summary"]
+    @current_summary = parsed_data2["currently"]["summary"]
 
-    @summary_of_next_sixty_minutes = parsed_data["minutely"][0]["Summary"]
+    @summary_of_next_sixty_minutes = parsed_data2["minutely"]["summary"]
 
-    @summary_of_next_several_hours = parsed_data["hourly"][0]["Summary"]
+    @summary_of_next_several_hours = parsed_data2["hourly"]["summary"]
 
-    @summary_of_next_several_days = parsed_data["daily"][0]["Summary"]
+    @summary_of_next_several_days = parsed_data2["daily"]["summary"]
 
     render("meteorologist/street_to_weather.html.erb")
   end
